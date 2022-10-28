@@ -3,10 +3,12 @@
 @section('container')
     <article>
         <h2>
-            {{ $post['title'] }}
+            {{ $post->title }}
         </h2>
-        <h5>By: {{ $post['author'] }}</h5>
-        <p>{{ $post['body'] }}</p>
+        <p>By <a href="/authors/{{ $post->author->user_name }}" class="text-decoration-none">{{ $post->author->name }}</a> in
+            <a href="/categories/{{ $post->category->slug }}" class="text-decoration-none">{{ $post->category->name }}</a>
+        </p>
+        <div>{!! $post->body !!}</div>
     </article>
-    <a href="/posts">Back to Posts</a>
+    <a href="/posts" class="d-block mt-3">Back to Posts</a>
 @endsection
