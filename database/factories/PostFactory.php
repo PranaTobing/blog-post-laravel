@@ -18,12 +18,12 @@ class PostFactory extends Factory
     public function definition()
     {
         $title = fake()->sentence(mt_rand(3, 6));
-        $paragraph = fake()->paragraph(mt_rand(20, 40));
+        $paragraph = fake()->paragraphs(mt_rand(5, 10));
         return [
             'title' => $title,
             'slug' => Str::slug($title, '-'),
-            'excerpt' => substr($paragraph, 0, 100),
-            'body' => $paragraph,
+            'excerpt' => fake()->paragraph(mt_rand(5, 10)),
+            'body' => collect($paragraph)->map(fn ($p) => "<p>$p</p>")->implode(''),
             'user_id' => mt_rand(1, 3),
             'category_id' => mt_rand(1, 3),
         ];
