@@ -23,8 +23,15 @@
 
     @if ($posts->count())
         <div class="card mb-3">
-            <img src="https://source.unsplash.com/800x200?{{ $posts[0]->category->slug }}" class="card-img-top"
-                alt="{{ $posts[0]->category->slug }}">
+            @if ($posts[0]->image)
+                <div style="max-height: 350px; overflow:hidden">
+                    <img src="{{ asset('storage/' . $posts[0]->image) }}" class="card-img-top img-fluid mt-3"
+                        alt="{{ $posts[0]->category->slug }}">
+                </div>
+            @else
+                <img src="https://source.unsplash.com/800x200?{{ $posts[0]->category->slug }}" class="card-img-top"
+                    alt="{{ $posts[0]->category->slug }}">
+            @endif
             <div class="card-body text-center">
                 <h3 class="card-title"><a href="/posts/{{ $posts[0]->slug }}"
                         class="text-decoration-none text-dark">{{ $posts[0]->title }}</a></h3>
@@ -54,8 +61,14 @@
                                     {{ $post->category->name }}
                                 </a>
                             </div>
-                            <img src="https://source.unsplash.com/500x400?{{ $post->category->slug }}" class="card-img-top"
-                                alt="{{ $post->category->slug }}">
+                            @if ($post->image)
+                                <img src="{{ asset('storage/' . $post->image) }}" class="card-img-top img-fluid mt-3"
+                                    alt="{{ $post->category->slug }}">
+                            @else
+                                <img src="https://source.unsplash.com/500x400?{{ $post->category->slug }}"
+                                    class="card-img-top" alt="{{ $post->category->slug }}">
+                            @endif
+
                             <div class="card-body">
                                 <h5 class="card-title">{{ $post->title }}</h5>
                                 <p>By <a href="/posts?author={{ $post->author->user_name }}"

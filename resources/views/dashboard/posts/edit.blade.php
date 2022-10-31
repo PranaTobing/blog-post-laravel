@@ -5,13 +5,13 @@
         <h1 class="h2">Edit Post</h1>
     </div>
     <div class="col-lg-8">
-        <form method="POST" action="/dashboard/posts/{{ $post->slug }}" class="mb-5">
+        <form method="POST" action="/dashboard/posts/{{ $post->slug }}" class="mb-5" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title"
-                    required autofocus value="{{ old('title', $post->title) }}">
+                <input type="text" class="form-control @error('title') is-invalid @enderror" id="title"
+                    name="title" required autofocus value="{{ old('title', $post->title) }}">
                 @error('title')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -31,7 +31,23 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="category" class="form-label">Category</label>
+                <label for="image" class="form-label">Post Image</label>
+                <input type="hidden" name="oldImage" value="{{ $post->image }}">
+                @if ($post->image)
+                    <img class="img-preview img-fluid mb-3 col-sm-5 d-block" src="{{ asset('storage/' . $post->image) }}">
+                @else
+                    <img class="img-preview img-fluid mb-3 col-sm-5">
+                @endif
+                <input class="form-control @error('image') is-invalid @enderror" type="file" id="image"
+                    name="image" onchange="previewImage()">
+                @error('image')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="body" class="form-label">Body</label>
                 <input id="body" type="hidden" name="body" value="{{ old('body', $post->body) }}">
                 <trix-editor input="body"></trix-editor>
                 @error('body')
@@ -46,6 +62,20 @@
     <script>
         document.addEventListener('trix-file-accept', function(e) {
             e.preventDefault();
-        })
+        });
+
+        function previewImage() {
+            const image = document.querySelector('#image');
+            const imgPreview = document.querySelector('.img-preview');
+
+            imgPreview.style.display = "block";
+
+            const oFReader = new FileReader();
+            oFReader.readAsDataURL(image.files[0]);
+
+            oFReader.onload = function(oFREvent) {
+                imgPreview.src = oFREvent.target.result;
+            }
+        }
     </script>
 @endsection

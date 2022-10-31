@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardPostController extends Controller
 {
@@ -43,11 +44,18 @@ class DashboardPostController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request->file('image')->store('post-images');
         $validatedData = $request->validate([
             "title" => "required|max:225",
             "category_id" => "required",
-            "body" => "required|min:300"
+            "image" => "image|file|max:2024",
+            "body" => "required|min:300",
         ]);
+
+        if ($request->file('image')) {
+            $validatedData['image'] = $request->file('image')->store('post-images');
+        }
+
         $validatedData['user_id'] = auth()->user()->id;
         $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 200);
 
@@ -95,16 +103,24 @@ class DashboardPostController extends Controller
         $validatedData = $request->validate([
             "title" => "required|max:225",
             "category_id" => "required",
+            "image" => "image|file|max:2024",
             "body" => "required|min:300"
         ]);
+
         $validatedData['user_id'] = auth()->user()->id;
         $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 200);
         $validatedData['slug'] = $this->checkSlug($request->title);
 
+        if ($request->file('image')) {
+            if ($request->oldImage) {
+                Storage::delete($request->oldImage);
+            }
+            $validatedData['image'] = $request->file('image')->store('post-images');
+        }
+
         if ($post->author->id != auth()->user()->id) {
             abort(403);
         }
-        // abort(403);
 
         Post::where('id', $post->id)->update($validatedData);
 
@@ -119,6 +135,9 @@ class DashboardPostController extends Controller
      */
     public function destroy(Post $post)
     {
+        if ($post->image) {
+            Storage::delete($post->image);
+        }
         Post::destroy($post->id);
 
         return redirect('/dashboard/posts')->with('success', 'New Post has been deleted');
